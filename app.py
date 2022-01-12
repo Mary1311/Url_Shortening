@@ -37,10 +37,14 @@ class Link(db.Model):
 @app.route('/shorten_url/', methods=['POST'])
 def shorten_url():
     url = request.json['url']
-    link = Link(url=url)
-    db.session.add(link)
-    db.session.commit()
-    return jsonify({"shorten_url": "http://localhost:8000/" + link.short_url})
+    link = Link.query.filter_by(url=url).first()
+    if link:
+        return jsonify({"shorten_url": "http://localhost:8000/" + link.short_url, "status": "1"})
+    else:
+        link = Link(url=url)
+        db.session.add(link)
+        db.session.commit()
+        return jsonify({"shorten_url": "http://localhost:8000/" + link.short_url, "status": "0"})
 
 
 @app.route('/<short_url>/', methods=['GET'])
